@@ -22,17 +22,21 @@
 
 ## 安装
 
-**方式一：手动（任何平台）**
+**方式一：skills CLI（推荐，任何支持 Skills 的 Agent 平台）**
 
 ```bash
-git clone https://github.com/<你的用户名>/workbuddy-points-radar.git
-cp -R workbuddy-points-radar ~/.workbuddy/skills/
+# GitHub 简写（自动发现 skills/ 下的 skill）
+npx skills add Candace666/workbuddy-points-radar
+
+# 或直接指定 skill 路径（官方文档格式）
+npx skills add https://github.com/Candace666/workbuddy-points-radar/tree/main/skills/workbuddy-points-radar
 ```
 
-**方式二：skills 市场（如已配置）**
+**方式二：手动（任何平台）**
 
 ```bash
-npx skills add <你的用户名>/workbuddy-points-radar
+git clone https://github.com/Candace666/workbuddy-points-radar.git
+cp -R workbuddy-points-radar/skills/workbuddy-points-radar ~/.workbuddy/skills/
 ```
 
 安装后重启 WorkBuddy 或新开对话即可触发。
@@ -67,16 +71,39 @@ python3 scripts/streak.py channels                        # 列出已知渠道�
 
 ## 文件结构
 
+本仓库采用 `skills/<skill-name>/` 多 skill 布局（[skills CLI 官方约定](https://github.com/vercel-labs/skills)），便于未来在同一仓库新增其他 skill：
+
 ```
-workbuddy-points-radar/
-├── SKILL.md                    # Skill 入口（工作流与合规红线）
-├── references/
-│   └── channels.md             # 积分渠道情报（规则/入口/收益/生态风险）
-├── scripts/
-│   └── streak.py               # 连签追踪工具（纯标准库，零依赖）
+workbuddy-points-radar/               # 仓库根目录
+├── skills/
+│   └── workbuddy-points-radar/       # ← skill 本体
+│       ├── SKILL.md                  # Skill 入口（工作流与合规红线）
+│       ├── references/
+│       │   └── channels.md           # 积分渠道情报（规则/入口/收益/生态风险）
+│       └── scripts/
+│           └── streak.py             # 连签追踪工具（纯标准库，零依赖）
 ├── README.md
-└── LICENSE
+├── LICENSE
+└── .gitignore                        # data/（领取记录）已忽略，永不上传
 ```
+
+## 维护与同步
+
+本仓库是 skill 的唯一源头。更新流程：
+
+```bash
+# 1. 在仓库内修改 skills/workbuddy-points-radar/ 下的文件
+cd workbuddy-points-radar
+git add . && git commit -m "..." && git push
+
+# 2. 同步到本机已安装位置（WorkBuddy 实际加载的副本）
+cp -R skills/workbuddy-points-radar/SKILL.md \
+      skills/workbuddy-points-radar/references \
+      skills/workbuddy-points-radar/scripts \
+      ~/.workbuddy/skills/workbuddy-points-radar/
+```
+
+> `data/streak.log`（个人领取记录）不属于仓库内容，两个位置各自独立，互不影响。
 
 ## 免责声明
 
